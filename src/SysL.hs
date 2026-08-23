@@ -74,7 +74,6 @@ module SysL
   )
 where
 
-import Circuit.Layer (run)
 import Circuit.Poly
   ( Eval (..),
     Mono,
@@ -84,7 +83,8 @@ import Circuit.Poly
     lens,
   )
 import Circuit.Process (Process (..))
-import Circuit.SMC (SMC (..))
+import Circuit.SMC (SMC, lift)
+import Circuit.Syntax (eval)
 import Data.Kind (Type)
 import Data.These (These (..))
 import Data.Void (Void, absurd)
@@ -404,11 +404,11 @@ type SMCThese = SMC (,) (->)
 -- ---------------------------------------------------------------------------
 
 commandToSMC :: Command v -> SMCThese (Env v) (Result v)
-commandToSMC (Cut t k) = SMCLift $ \env ->
-  case run (termToSMC t) env of
+commandToSMC (Cut t k) = lift $ \env ->
+  case eval (termToSMC t) env of
     This out -> This out
-    That val -> run (cotermToSMC k) (env, val)
-    These res val -> combine res (run (cotermToSMC k) (env, val))
+    That val -> eval (cotermToSMC k) (env, val)
+    These res val -> combine res (eval (cotermToSMC k) (env, val))
   where
     combine res (This res') = These res res'
     combine res (That foc) = These res foc
@@ -416,80 +416,80 @@ commandToSMC (Cut t k) = SMCLift $ \env ->
     merge (i, _) (j, _) = (max i j, VUnit)
 
 termToSMC :: Term v -> SMCThese (Env v) (These (Output v) (Val v))
-termToSMC (Embed v) = SMCLift $ \env -> That (evalValue v env)
-termToSMC (Mu cmd) = SMCLift $ \env ->
-  case run (commandToSMC cmd) env of
+termToSMC (Embed v) = lift $ \env -> That (evalValue v env)
+termToSMC (Mu cmd) = lift $ \env ->
+  case eval (commandToSMC cmd) env of
     This out -> This out
     That (0, val) -> That val
     That out -> This out
     These res (0, val) -> These res val
     These res foc -> These res (snd foc)
-termToSMC (ThenComatch cmd) = SMCLift $ \env ->
-  let fwdA = case run (commandToSMC cmd) env of
+termToSMC (ThenComatch cmd) = lift $ \env ->
+  let fwdA = case eval (commandToSMC cmd) env of
         That (1, v) -> v
         These _ (1, v) -> v
         _ -> error "ThenComatch: expected slot 1 for fwd a"
-      bwCont bwA = run (commandToSMC cmd) (bwA : env)
+      bwCont bwA = eval (commandToSMC cmd) (bwA : env)
    in That (VThen fwdA bwCont)
 
 cotermToSMC :: Coterm v -> SMCThese (Env v, Val v) (Result v)
-cotermToSMC (Covar i) = SMCLift $ \(_, val) ->
+cotermToSMC (Covar i) = lift $ \(_, val) ->
   if i == 0 then That (0, val) else This (i, val)
-cotermToSMC (Comu cmd) = SMCLift $ \(env, val) ->
-  run (commandToSMC cmd) (val : env)
-cotermToSMC (TensorMatch cmd) = SMCLift $ \(env, val) ->
+cotermToSMC (Comu cmd) = lift $ \(env, val) ->
+  eval (commandToSMC cmd) (val : env)
+cotermToSMC (TensorMatch cmd) = lift $ \(env, val) ->
   case val of
-    VPair x y -> run (commandToSMC cmd) (x : y : env)
+    VPair x y -> eval (commandToSMC cmd) (x : y : env)
     _ -> error $ "TensorMatch: not a pair: " <> show' val
-cotermToSMC (PlusMatch c1 c2) = SMCLift $ \(env, val) ->
+cotermToSMC (PlusMatch c1 c2) = lift $ \(env, val) ->
   case val of
-    VLeft x -> run (commandToSMC c1) (x : env)
-    VRight y -> run (commandToSMC c2) (y : env)
+    VLeft x -> eval (commandToSMC c1) (x : env)
+    VRight y -> eval (commandToSMC c2) (y : env)
     _ -> error $ "PlusMatch: not a sum: " <> show' val
-cotermToSMC (HomCointro t k) = SMCLift $ \(env, val) ->
-  case run (termToSMC t) env of
+cotermToSMC (HomCointro t k) = lift $ \(env, val) ->
+  case eval (termToSMC t) env of
     This out -> This out
     That arg -> case val of
       VFun f -> case f arg of
         This out -> This out
-        That (_, v) -> run (cotermToSMC k) (env, v)
-        These out (_, v) -> combine out (run (cotermToSMC k) (env, v))
+        That (_, v) -> eval (cotermToSMC k) (env, v)
+        These out (_, v) -> combine out (eval (cotermToSMC k) (env, v))
       _ -> error "HomCointro: not a function"
     These res arg -> case val of
       VFun f -> case f arg of
         This out -> These res out
-        That (_, v) -> combine res (run (cotermToSMC k) (env, v))
-        These out (_, v) -> combine (merge res out) (run (cotermToSMC k) (env, v))
+        That (_, v) -> combine res (eval (cotermToSMC k) (env, v))
+        These out (_, v) -> combine (merge res out) (eval (cotermToSMC k) (env, v))
       _ -> error "HomCointro: not a function"
   where
     combine res (This res') = These res res'
     combine res (That foc) = These res foc
     combine res (These res' foc) = These (merge res res') foc
     merge (i, _) (j, _) = (max i j, VUnit)
-cotermToSMC (GradedHomCointro t coterms) = SMCLift $ \(env, val) ->
-  case run (termToSMC t) env of
+cotermToSMC (GradedHomCointro t coterms) = lift $ \(env, val) ->
+  case eval (termToSMC t) env of
     This out -> This out
     That arg -> case val of
       VGradedFun f -> case f arg of
         This out -> This out
-        That (slot, v) -> run (cotermToSMC (coterms !! slot)) (env, v)
-        These out (slot, v) -> combine out (run (cotermToSMC (coterms !! slot)) (env, v))
+        That (slot, v) -> eval (cotermToSMC (coterms !! slot)) (env, v)
+        These out (slot, v) -> combine out (eval (cotermToSMC (coterms !! slot)) (env, v))
       _ -> error "GradedHomCointro: not a graded function"
     These res arg -> case val of
       VGradedFun f -> case f arg of
         This out -> These res out
-        That (slot, v) -> combine res (run (cotermToSMC (coterms !! slot)) (env, v))
-        These out (slot, v) -> combine (merge res out) (run (cotermToSMC (coterms !! slot)) (env, v))
+        That (slot, v) -> combine res (eval (cotermToSMC (coterms !! slot)) (env, v))
+        These out (slot, v) -> combine (merge res out) (eval (cotermToSMC (coterms !! slot)) (env, v))
       _ -> error "GradedHomCointro: not a graded function"
   where
     combine res (This res') = These res res'
     combine res (That foc) = These res foc
     combine res (These res' foc) = These (merge res res') foc
     merge (i, _) (j, _) = (max i j, VUnit)
-cotermToSMC (ThenCointro k1 k2) = SMCLift $ \(env, val) ->
+cotermToSMC (ThenCointro k1 k2) = lift $ \(env, val) ->
   case val of
     VThen fwdA cont ->
-      case run (cotermToSMC k1) (env, fwdA) of
+      case eval (cotermToSMC k1) (env, fwdA) of
         This (_, residual) -> dispatch residual
         That (_, residual) -> dispatch residual
         These _ (_, residual) -> dispatch residual
@@ -497,8 +497,8 @@ cotermToSMC (ThenCointro k1 k2) = SMCLift $ \(env, val) ->
         dispatch residual =
           case cont residual of
             This out -> This out
-            That (_, fwdB) -> run (cotermToSMC k2) (env, fwdB)
-            These out (_, fwdB) -> combine out (run (cotermToSMC k2) (env, fwdB))
+            That (_, fwdB) -> eval (cotermToSMC k2) (env, fwdB)
+            These out (_, fwdB) -> combine out (eval (cotermToSMC k2) (env, fwdB))
         combine res (This res') = These res res'
         combine res (That foc) = These res foc
         combine res (These res' foc) = These (merge res res') foc
@@ -575,7 +575,7 @@ testThen =
 -- | Identity test compiled to SMC.
 testIdLoop :: Result ()
 testIdLoop =
-  run
+  eval
     ( commandToSMC
         ( Cut
             (Embed (HomComatch (Cut (Embed (Var 0)) (Covar 0))))
@@ -588,7 +588,7 @@ testIdLoop =
 testThenLoop :: Result Double
 testThenLoop =
   let val = VThen (VEmbed 1.0) (\x -> That (0, x))
-   in run
+   in eval
         ( commandToSMC
             ( Cut
                 (Embed (Lit val))
