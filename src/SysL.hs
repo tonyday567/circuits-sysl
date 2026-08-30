@@ -83,8 +83,8 @@ import Circuit.Poly
     lens,
   )
 import Circuit.Process (Process (..))
-import Circuit.SMC (SMC, lift)
-import Circuit.Syntax (eval)
+import Circuit.SMC (SMC)
+import Circuit.Syntax (Syntax (Lift), eval)
 import Data.Kind (Type)
 import Data.These (These (..))
 import Data.Void (Void, absurd)
@@ -404,7 +404,7 @@ type SMCThese = SMC (,) (->)
 -- ---------------------------------------------------------------------------
 
 commandToSMC :: Command v -> SMCThese (Env v) (Result v)
-commandToSMC (Cut t k) = lift $ \env ->
+commandToSMC (Cut t k) = Lift $ \env ->
   case eval (termToSMC t) env of
     This out -> This out
     That val -> eval (cotermToSMC k) (env, val)
@@ -416,15 +416,15 @@ commandToSMC (Cut t k) = lift $ \env ->
     merge (i, _) (j, _) = (max i j, VUnit)
 
 termToSMC :: Term v -> SMCThese (Env v) (These (Output v) (Val v))
-termToSMC (Embed v) = lift $ \env -> That (evalValue v env)
-termToSMC (Mu cmd) = lift $ \env ->
+termToSMC (Embed v) = Lift $ \env -> That (evalValue v env)
+termToSMC (Mu cmd) = Lift $ \env ->
   case eval (commandToSMC cmd) env of
     This out -> This out
     That (0, val) -> That val
     That out -> This out
     These res (0, val) -> These res val
     These res foc -> These res (snd foc)
-termToSMC (ThenComatch cmd) = lift $ \env ->
+termToSMC (ThenComatch cmd) = Lift $ \env ->
   let fwdA = case eval (commandToSMC cmd) env of
         That (1, v) -> v
         These _ (1, v) -> v
@@ -433,20 +433,20 @@ termToSMC (ThenComatch cmd) = lift $ \env ->
    in That (VThen fwdA bwCont)
 
 cotermToSMC :: Coterm v -> SMCThese (Env v, Val v) (Result v)
-cotermToSMC (Covar i) = lift $ \(_, val) ->
+cotermToSMC (Covar i) = Lift $ \(_, val) ->
   if i == 0 then That (0, val) else This (i, val)
-cotermToSMC (Comu cmd) = lift $ \(env, val) ->
+cotermToSMC (Comu cmd) = Lift $ \(env, val) ->
   eval (commandToSMC cmd) (val : env)
-cotermToSMC (TensorMatch cmd) = lift $ \(env, val) ->
+cotermToSMC (TensorMatch cmd) = Lift $ \(env, val) ->
   case val of
     VPair x y -> eval (commandToSMC cmd) (x : y : env)
     _ -> error $ "TensorMatch: not a pair: " <> show' val
-cotermToSMC (PlusMatch c1 c2) = lift $ \(env, val) ->
+cotermToSMC (PlusMatch c1 c2) = Lift $ \(env, val) ->
   case val of
     VLeft x -> eval (commandToSMC c1) (x : env)
     VRight y -> eval (commandToSMC c2) (y : env)
     _ -> error $ "PlusMatch: not a sum: " <> show' val
-cotermToSMC (HomCointro t k) = lift $ \(env, val) ->
+cotermToSMC (HomCointro t k) = Lift $ \(env, val) ->
   case eval (termToSMC t) env of
     This out -> This out
     That arg -> case val of
@@ -466,7 +466,7 @@ cotermToSMC (HomCointro t k) = lift $ \(env, val) ->
     combine res (That foc) = These res foc
     combine res (These res' foc) = These (merge res res') foc
     merge (i, _) (j, _) = (max i j, VUnit)
-cotermToSMC (GradedHomCointro t coterms) = lift $ \(env, val) ->
+cotermToSMC (GradedHomCointro t coterms) = Lift $ \(env, val) ->
   case eval (termToSMC t) env of
     This out -> This out
     That arg -> case val of
@@ -486,7 +486,7 @@ cotermToSMC (GradedHomCointro t coterms) = lift $ \(env, val) ->
     combine res (That foc) = These res foc
     combine res (These res' foc) = These (merge res res') foc
     merge (i, _) (j, _) = (max i j, VUnit)
-cotermToSMC (ThenCointro k1 k2) = lift $ \(env, val) ->
+cotermToSMC (ThenCointro k1 k2) = Lift $ \(env, val) ->
   case val of
     VThen fwdA cont ->
       case eval (cotermToSMC k1) (env, fwdA) of
