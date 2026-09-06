@@ -82,8 +82,8 @@ import Circuit.Poly
     applyLens,
     lens,
   )
-import Circuit.Process (Process (..))
-import Circuit.SMC (SMC)
+import Circuit.Net (SMC)
+import Circuit.Process (Mealy (..))
 import Circuit.Syntax (Syntax (Lift), eval)
 import Data.Kind (Type)
 import Data.These (These (..))
@@ -512,8 +512,8 @@ cotermToSMC (ThenCointro k1 k2) = Lift $ \(env, val) ->
 -- | Streaming interpreter: each input is a fresh environment, each output is
 -- the focus value of the term.  Residual escape is a run-time error, which is
 -- the expected behaviour for a closed term consumed by a process.
-evalProcess :: Term v -> Process (Env v) (Val v)
-evalProcess t = Process inject step extract
+evalProcess :: Term v -> Mealy (Env v) (Val v)
+evalProcess t = Mealy inject step extract
   where
     inject env = env
     step _ env = env
