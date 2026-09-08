@@ -1,4 +1,4 @@
 packages:
-  sysl.cabal
+  circuits-sysl.cabal
 
 write-ghc-environment-files: always

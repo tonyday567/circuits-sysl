@@ -1,5 +1,5 @@
 cabal-version: 3.0
-name: sysl
+name: circuits-sysl
 version: 0.1.0.0
 license: BSD-3-Clause
 license-file: LICENSE
@@ -7,8 +7,8 @@ copyright: Tony Day (c) 2026
 category: Language
 author: Tony Day
 maintainer: tonyday567@gmail.com
-homepage: https://github.com/tonyday567/sysl#readme
-bug-reports: https://github.com/tonyday567/sysl/issues
+homepage: https://github.com/tonyday567/circuits-sysl#readme
+bug-reports: https://github.com/tonyday567/circuits-sysl/issues
 synopsis: System language interpreter with traced monoidal evaluation
 description:
   A system language with commands, values, terms and coterms, interpreted via traced monoidal categories.
@@ -21,7 +21,7 @@ tested-with:
 
 source-repository head
   type: git
-  location: https://github.com/tonyday567/sysl
+  location: https://github.com/tonyday567/circuits-sysl
 
 common ghc-options-stanza
   ghc-options:
@@ -39,14 +39,14 @@ library
   default-language: GHC2024
   hs-source-dirs: src
   exposed-modules:
-    SysL
+    Circuit.SysL
 
   build-depends:
     base >=4.20 && <5,
     circuits >=0.3 && <0.4,
     these >=1.1 && <1.3,
 
-executable sysl-axioma
+executable circuits-sysl-axioma
   import: ghc-options-stanza
   default-language: GHC2024
   main-is: axioma.hs
@@ -54,5 +54,5 @@ executable sysl-axioma
   build-depends:
     base >=4.20 && <5,
     circuits >=0.3 && <0.4,
-    sysl,
+    circuits-sysl,
     these >=1.1 && <1.3,

@@ -1,5 +1,5 @@
 packages:
-  sysl.cabal
+  circuits-sysl.cabal
 
 source-repository-package
   type: git

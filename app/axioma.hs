@@ -4,11 +4,11 @@ module Main where
 import Circuit.Process (scan)
 import Circuit.Syntax (eval)
 import Data.These (These (..))
-import SysL
+import Circuit.SysL
 
 main :: IO ()
 main = do
-  putStrLn "sysl-axioma oracles"
+  putStrLn "circuits-sysl-axioma oracles"
   let results =
         [ s1OneRoundTrip,
           s2TimesRoundTrip,

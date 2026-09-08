@@ -2,7 +2,7 @@
 
 # System L on Circuit — Polynomial Encoding with These Boundaries
 
-This card describes the `poly-redo` version of SysL (`~/haskell/sysl/`).
+This card describes the `poly-redo` version of SysL (`~/haskell/circuits-sysl/`).
 The interpreter has been rebuilt as a `circuits` client:
 
 - User-facing types are promoted to `Circuit.Poly` polynomials via `SysLTy`.
@@ -113,7 +113,7 @@ value.  This is the entry point for scheduled / stateful semantics.
 
 ## Oracle suite
 
-`cabal run sysl-axioma` prints `all green` when the following pass:
+`cabal run circuits-sysl-axioma` prints `all green` when the following pass:
 
 | Oracle | What it checks |
 |--------|----------------|
@@ -152,7 +152,7 @@ the `These` inclusive tensor for covariable scheduling.
 
 ```bash
 cabal build
-cabal run sysl-axioma
+cabal run circuits-sysl-axioma
 ```
 
 Expected output:

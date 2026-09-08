@@ -25,7 +25,7 @@
 --
 -- The original four regression tests are preserved as 'testId', 'testThen',
 -- 'testIdLoop' and 'testThenLoop'.
-module SysL
+module Circuit.SysL
   ( -- * Types
     Ty (..),
     SysLTy,

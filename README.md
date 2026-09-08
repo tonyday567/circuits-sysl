@@ -1,4 +1,4 @@
-# sysl
+# circuits-sysl
 
 A system language interpreter using traced monoidal evaluation.
 
@@ -24,7 +24,7 @@ The `poly-redo` branch re-implements the interpreter as a `circuits` client:
 
 ```bash
 cabal build
-cabal run sysl-axioma
+cabal run circuits-sysl-axioma
 ```
 
 The `sysl-axioma` executable runs ten oracles (S1–S10) covering each
@@ -41,7 +41,7 @@ boundaries.
 
 ### app/axioma.hs
 
-Oracle executable.  Run with `cabal run sysl-axioma`.
+Oracle executable.  Run with `cabal run circuits-sysl-axioma`.
 
 ## Version
 
