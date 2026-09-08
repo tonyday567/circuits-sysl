@@ -1,10 +1,10 @@
 -- | SysL oracle suite: polynomial encoding and @These@ boundaries.
 module Main where
 
-import Circuit.Process (scan)
+import Circuit.Cell (scan)
 import Circuit.Syntax (eval)
-import Data.These (These (..))
 import Circuit.SysL
+import Data.These (These (..))
 
 main :: IO ()
 main = do

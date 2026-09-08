@@ -2,6 +2,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -21,7 +22,7 @@
 --   inclusive tensor in "Circuit.Channel".
 -- * The syntactic target is the free SMC @SMC (->)@; boundaries use 'These'
 --   at the value level.
--- * A streaming reading is provided via 'Circuit.Process'.
+-- * A streaming reading is provided via 'Circuit.Cell'.
 --
 -- The original four regression tests are preserved as 'testId', 'testThen',
 -- 'testIdLoop' and 'testThenLoop'.
@@ -74,6 +75,8 @@ module Circuit.SysL
   )
 where
 
+import Circuit.Cell (Moore, pattern Moore)
+import Circuit.Net (SMC)
 import Circuit.Poly
   ( Eval (..),
     Mono,
@@ -82,8 +85,6 @@ import Circuit.Poly
     applyLens,
     lens,
   )
-import Circuit.Net (SMC)
-import Circuit.Process (Moore (..))
 import Circuit.Syntax (Syntax (Lift), eval)
 import Data.Kind (Type)
 import Data.These (These (..))
