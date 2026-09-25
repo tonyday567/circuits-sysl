@@ -75,7 +75,7 @@ module Circuit.SysL
   )
 where
 
-import Circuit.Cell (Moore, pattern Moore)
+import Circuit.GMachine (Moore, pattern Moore)
 import Circuit.Net (SMC)
 import Circuit.Poly
   ( Eval (..),

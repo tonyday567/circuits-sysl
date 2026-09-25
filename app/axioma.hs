@@ -1,7 +1,7 @@
 -- | SysL oracle suite: polynomial encoding and @These@ boundaries.
 module Main where
 
-import Circuit.Cell (scan)
+import Circuit.GMachine (scan)
 import Circuit.Syntax (eval)
 import Circuit.SysL
 import Data.These (These (..))
