@@ -22,7 +22,7 @@
 --   inclusive tensor in "Circuit.Channel".
 -- * The syntactic target is the free SMC @SMC (->)@; boundaries use 'These'
 --   at the value level.
--- * A streaming reading is provided via 'Circuit.Cell'.
+-- * A streaming reading is provided via 'Circuit.GMachine'.
 --
 -- The original four regression tests are preserved as 'testId', 'testThen',
 -- 'testIdLoop' and 'testThenLoop'.
