@@ -112,9 +112,9 @@ data Ty
 -- lenses / dependent optics, which is the natural polynomial reading of
 -- functions with a backward map.
 type family SysLTy (t :: Ty) :: Poly where
-  SysLTy 'One = 'Const ()
+  SysLTy 'One = 'Konst ()
   SysLTy ('Times a b) = 'Prod (SysLTy a) (SysLTy b)
-  SysLTy 'Zero = 'Const Void
+  SysLTy 'Zero = 'Konst Void
   SysLTy ('Plus a b) = 'Sum (SysLTy a) (SysLTy b)
   SysLTy ('Hom a b) = Mono (Domain a) (Domain b)
   SysLTy ('Then a b) = Mono (Domain a) (Domain b)
@@ -137,7 +137,7 @@ type family GradedResult (bs :: [Ty]) :: Type where
 
 -- | Polynomial for a graded homomorphism: a sum of monomial lenses.
 type family GradedPoly (a :: Ty) (bs :: [Ty]) :: Poly where
-  GradedPoly _ '[] = 'Const Void
+  GradedPoly _ '[] = 'Konst Void
   GradedPoly a (b ': bs) = 'Sum (Mono (Domain a) (Domain b)) (GradedPoly a bs)
 
 -- ---------------------------------------------------------------------------
