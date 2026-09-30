@@ -75,7 +75,7 @@ module Circuit.SysL
   )
 where
 
-import Circuit.GMachine (Moore, pattern Moore)
+import Circuit.GMachine (Moore, moore)
 import Circuit.Net (SMC)
 import Circuit.Poly
   ( Eval (..),
@@ -514,7 +514,7 @@ cotermToSMC (ThenCointro k1 k2) = Lift $ \(env, val) ->
 -- the focus value of the term.  Residual escape is a run-time error, which is
 -- the expected behaviour for a closed term consumed by a process.
 evalProcess :: Term v -> Moore (Env v) (Val v)
-evalProcess t = Moore inject step extract
+evalProcess t = moore inject step extract
   where
     inject env = env
     step _ env = env
