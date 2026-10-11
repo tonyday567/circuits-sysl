@@ -2,7 +2,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE PolyKinds #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -22,7 +21,7 @@
 --   inclusive tensor in "Circuit.Channel".
 -- * The syntactic target is the free SMC @SMC (->)@; boundaries use 'These'
 --   at the value level.
--- * A streaming reading is provided via 'Circuit.GMachine'.
+-- * A streaming reading is provided via 'Circuit.Machine'.
 --
 -- The original four regression tests are preserved as 'testId', 'testThen',
 -- 'testIdLoop' and 'testThenLoop'.
@@ -75,7 +74,7 @@ module Circuit.SysL
   )
 where
 
-import Circuit.GMachine (Moore, moore)
+import Circuit.Machine (MooreT, moore)
 import Circuit.Net (SMC)
 import Circuit.Poly
   ( Eval (..),
@@ -513,7 +512,7 @@ cotermToSMC (ThenCointro k1 k2) = Lift $ \(env, val) ->
 -- | Streaming interpreter: each input is a fresh environment, each output is
 -- the focus value of the term.  Residual escape is a run-time error, which is
 -- the expected behaviour for a closed term consumed by a process.
-evalProcess :: Term v -> Moore (Env v) (Val v)
+evalProcess :: Term v -> MooreT (,) (->) (Env v) (Val v)
 evalProcess t = moore inject step extract
   where
     inject env = env
