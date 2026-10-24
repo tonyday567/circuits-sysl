@@ -397,7 +397,7 @@ show' (VEmbed _) = "VEmbed"
 -- @SMC (->)@ is the free SMC over plain functions.  Boundaries are still
 -- expressed with 'These' at the value level, but the free category itself
 -- uses the cartesian @(,)@ tensor for 'SMCPar' wiring rather than the
--- inclusive 'These' tensor.  This avoids the impossibility of a 'Traced'
+-- inclusive 'These' tensor.  This avoids the impossibility of a 'Trace'
 -- instance for 'These'.
 type SMCThese = SMC (,) (->)
 

@@ -75,7 +75,7 @@ termToLoop    :: Term v    -> Loop These (->) (Env v) (These (Output v) (Val v))
 cotermToLoop  :: Coterm v  -> Loop These (->) (Env v, Val v) (Result v)
 ```
 
-Because `Circuit.Channel` did not yet ship a `Traced These (->)` base
+Because `Circuit.Channel` did not yet ship a `Trace These (->)` base
 instance, SysL supplies the orphan instance needed to interpret `Knot`
 bodies: iterate the feedback channel (`This`) until the body produces a
 payload (`That` or `These`).
